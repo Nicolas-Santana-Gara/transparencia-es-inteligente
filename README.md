@@ -36,6 +36,8 @@ proporções de registros com valor zero e negativo; download dos registros em C
 
 Ainda não existe: dados de 2024, API de consulta, banco de dados, alertas e login.
 
+A proposta técnica e os slides estão em `docs/`.
+
 ## Como rodar
 
 Precisa de Python 3.10 ou mais novo.
@@ -176,10 +178,7 @@ no formato dos arquivos oficiais; não são dados reais.
 ## Uso de IA
 
 Usamos um assistente de IA (Claude) como apoio na escrita do código, na revisão dos
-textos e na montagem dos slides. Verificamos assim:
-
-- os testes automáticos comparam as contas com valores calculados à mão;
-- os totais do painel foram comparados com somas feitas direto nos arquivos originais;
-- cada integrante leu e rodou a parte do código pela qual responde.
+textos e na montagem dos slides. A verificação foi feita com os testes automáticos, que
+comparam as contas com valores calculados à mão.
 
 A solução em si não usa IA para classificar despesas nem para apontar fraude.
