@@ -1,0 +1,65 @@
+{
+  "linhas_lidas": 40000,
+  "colunas": {
+    "data": "Data",
+    "valor_empenho": "ValorEmpenho",
+    "valor_liquidado": "ValorLiquidado",
+    "valor_pago": "ValorPago",
+    "valor_rap": "ValorRap",
+    "unidade_gestora": "UnidadeGestora",
+    "grupo_despesa": "GrupoDespesa",
+    "modalidade": "Modalidade",
+    "favorecido": "Favorecido",
+    "documento": "Documento",
+    "id": "Id",
+    "orgao": "Orgao",
+    "funcao": "Funcao",
+    "numero_processo": "NumeroProcesso"
+  },
+  "linhas_duplicadas": 0,
+  "valores_invalidos": {
+    "valor_empenho": 0,
+    "valor_liquidado": 0,
+    "valor_pago": 0,
+    "valor_rap": 0
+  },
+  "datas_invalidas": 0,
+  "datas_em_branco": 0,
+  "em_branco": {
+    "unidade_gestora": 0,
+    "grupo_despesa": 0,
+    "modalidade": 0,
+    "favorecido": 0,
+    "documento": 0,
+    "id": 0,
+    "orgao": 40000,
+    "funcao": 40000,
+    "numero_processo": 40000
+  },
+  "campos_totalmente_em_branco": [
+    "orgao",
+    "funcao",
+    "numero_processo"
+  ],
+  "campos_ausentes_no_arquivo": [],
+  "pago_zero": 27974,
+  "pago_negativo": 843,
+  "pago_positivo": 11183,
+  "pago_em_branco": 0,
+  "registros": 40000,
+  "periodo": [
+    "02/01/2025",
+    "31/12/2025"
+  ],
+  "arquivos": [
+    "dados_simulados_demo.csv"
+  ],
+  "medidas": [
+    "valor_empenho",
+    "valor_liquidado",
+    "valor_pago",
+    "valor_rap"
+  ],
+  "simulado": true,
+  "gerado_em": "04/10/2026 18:42"
+}
