@@ -1,0 +1,6 @@
+Coloque aqui os arquivos ZIP de despesas de 2025 fornecidos na disciplina
+e rode, na pasta do projeto:
+
+    python -m src.etl
+
+Os ZIPs não vão para o repositório (estão no .gitignore).
