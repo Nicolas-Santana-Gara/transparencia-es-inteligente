@@ -6,7 +6,7 @@ Painel para explorar as despesas do Governo do Espírito Santo em 2025. Mostra q
 pagamentos se concentram, quais unidades gestoras e grupos de despesa recebem mais, e
 permite chegar de qualquer número até o Documento e o Id do registro que o formou.
 
-**Painel no ar (modo demonstração):** https://transparencia-es-inteligente.vercel.app
+**Painel no ar, com os dados oficiais de 2025:** https://transparencia-es-inteligente.vercel.app
 
 **Empresa fictícia:** DataCidadã Tech · **Turma:** 2ESPK
 
@@ -36,7 +36,8 @@ Além disso: filtros por mês, unidade gestora e grupo de despesa, que valem par
 abas; intervalo de confiança de 95% do pagamento médio (mês de pico x demais meses) e das
 proporções de registros com valor zero e negativo; download dos registros em CSV.
 
-Ainda não existe: dados de 2024, API de consulta, banco de dados, alertas e login.
+Ainda não existe: dados de 2024 no painel (os arquivos foram fornecidos, mas a POC usa só
+2025), API de consulta, banco de dados, alertas e login.
 
 A proposta técnica e os slides estão em `docs/`.
 
@@ -61,22 +62,28 @@ streamlit run app.py
 
 O painel abre em http://localhost:8501.
 
-### Com os dados oficiais
+O repositório já traz os dados oficiais de 2025 processados em `data_processed/`
+(586.208 registros), então o painel abre logo depois de clonar, sem precisar dos ZIPs.
+
+### Refazer o processamento
 
 1. Coloque os quatro arquivos ZIP de despesas de 2025 na pasta `data_raw/`.
-2. Processe os dados (leva alguns segundos) e atualize a página do painel:
+2. Processe os dados (leva cerca de 20 segundos) e atualize a página do painel:
 
 ```bash
 python -m src.etl
 ```
 
+O resultado tem que ser igual ao que está no repositório: 586.208 registros, de 02/01/2025
+a 31/12/2025, e R$ 11.275.208.229,53 de valor pago.
+
 ### Modo demonstração
 
-O repositório já vem com um conjunto **simulado** em `data_processed/`, para o painel abrir
-logo depois de clonar. São 40.000 registros inventados, com nomes claramente fictícios
-("UNIDADE GESTORA DEMO 01"), e o painel mostra um aviso em todas as telas enquanto
-estiver nesse modo. Esses números não são resultado de análise e não devem ser citados.
-Rodar o ETL com os ZIPs oficiais substitui o conjunto simulado. Para gerá-lo de novo:
+Para mostrar o painel sem os dados oficiais, o ETL também gera um conjunto **simulado**:
+40.000 registros inventados, com nomes claramente fictícios ("UNIDADE GESTORA DEMO 01").
+Nesse modo o painel mostra um aviso em todas as telas, e os números não são resultado de
+análise. Ele substitui o que estiver em `data_processed/`; para voltar aos dados oficiais,
+rode `python -m src.etl` de novo.
 
 ```bash
 python -m src.etl --demo
@@ -87,18 +94,22 @@ python -m src.etl --demo
 - **Fonte:** Governo do Estado do Espírito Santo (Portal da Transparência), com o
   Dicionário de Dados v1.0. Usamos os quatro arquivos ZIP de despesas de 2025 fornecidos
   na disciplina.
-- **Formato:** CSV com separador ponto e vírgula, UTF-8 com BOM e vírgula decimal.
-- **Campos usados:** Id, Documento, Data, UnidadeGestora, GrupoDespesa, Modalidade,
-  Favorecido, ValorEmpenho, ValorLiquidado, ValorPago e ValorRap.
+- **Formato:** CSV com separador ponto e vírgula, UTF-8 com BOM e vírgula decimal, com
+  71 colunas.
+- **Campos usados:** Id, Documento, Data, UnidadeGestora, GrupoDespesa, ElementoDespesa,
+  Acao, Modalidade, TipoLicitacao, Favorecido, CpfCnpjNis, ValorEmpenho, ValorLiquidado,
+  ValorPago e ValorRap. As outras colunas do arquivo, como os dados bancários, não são
+  gravadas em `data_processed/`.
 
-Os ZIPs não ficam no repositório. O material fornecido é um recorte sistemático: os
-totais que aparecem no painel valem para esse conjunto e não para o Estado inteiro.
+Os ZIPs não ficam no repositório (são grandes); fica só o resultado do processamento. O
+material fornecido é um recorte sistemático: os totais que aparecem no painel valem para
+esse conjunto e não para o Estado inteiro.
 
 ### O que o ETL faz
 
 | Situação | Decisão |
 |---|---|
-| Linha idêntica a outra em todas as colunas | Remove a repetida e conta |
+| Linha idêntica a outra em todas as 71 colunas | Remove a repetida e conta |
 | Data impossível ou em formato desconhecido | Mantém o registro, sem data, e conta |
 | Valor que não é número | Mantém o registro, com o valor em branco, e conta |
 | ValorPago igual a zero | Mantém: é outra etapa da despesa |
@@ -140,8 +151,8 @@ Se um arquivo vier com nome de coluna diferente, basta acrescentar o nome na lis
 pytest
 ```
 
-São 31 testes: conversão de valores e datas, leitura do ZIP, contagem dos achados de
-qualidade, totais e intervalos de confiança conferidos à mão, busca sem acento, máscara de
+São 33 testes: conversão de valores e datas, leitura do ZIP, contagem dos achados de
+qualidade, descarte das colunas que o painel não usa, totais e intervalos de confiança conferidos à mão, busca sem acento, máscara de
 CPF, o modo demonstração e o painel inteiro em sete situações (dados normais, sem dados
 processados, filtro sem resultado, busca sem resultado, troca de filtro e com e sem o
 aviso de dados simulados). Os testes usam 12 linhas inventadas
@@ -167,7 +178,7 @@ no formato dos arquivos oficiais; não são dados reais.
 
 ## Limitações conhecidas
 
-- Só há dados de 2025; não dá para comparar com outros anos.
+- O painel só tem 2025; ainda não dá para comparar com 2024.
 - Órgão, Função e Número do processo vêm em branco, então não há análise por esses campos.
 - Os intervalos de confiança supõem amostra aleatória. O conjunto é um recorte
   sistemático, por isso eles valem como referência.
@@ -175,7 +186,8 @@ no formato dos arquivos oficiais; não são dados reais.
   pagamentos grandes. A mediana aparece ao lado.
 - Um pico ou um registro atípico não é prova de irregularidade.
 - Os dados ficam em memória; com volumes muito maiores seria preciso um banco de dados.
-- CPF de favorecido aparece mascarado; CNPJ, que é dado de empresa, é mantido.
+- CPF de favorecido já vem mascarado na fonte (###.123.456-##) e é exibido assim; CNPJ,
+  que é dado de empresa, é mantido.
 
 ## Uso de IA
 

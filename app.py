@@ -11,6 +11,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import pyarrow.parquet as pq
 import streamlit as st
 
 from src import analise
@@ -53,10 +54,16 @@ def pct(x, casas=1):
     return f"{x:.{casas}f}%".replace(".", ",")
 
 
-@st.cache_data(show_spinner="Carregando os dados processados...")
+@st.cache_resource(show_spinner="Carregando os dados processados...")
 def carregar(pasta, assinatura):
-    # 'assinatura' (tamanho e data do arquivo) só serve para o cache notar quando o ETL rodou de novo
-    registros = pd.read_parquet(Path(pasta) / "registros.parquet")
+    # 'assinatura' (tamanho e data do arquivo) só serve para o cache notar quando o ETL rodou de novo.
+    # cache_resource guarda uma cópia só na memória para todas as sessões; o painel nunca altera esta tabela.
+    caminho = Path(pasta) / "registros.parquet"
+    # textos que se repetem muito (unidade gestora, favorecido...) são lidos como categoria:
+    # o nome fica guardado uma vez só, e a tabela inteira ocupa bem menos memória
+    textos = (set(TEXTOS) | {"codigo_favorecido", "arquivo_origem"}) - {"id"}
+    repetidos = [c for c in pq.read_schema(caminho).names if c in textos]
+    registros = pq.read_table(caminho, read_dictionary=repetidos).to_pandas()
     qualidade = json.loads((Path(pasta) / "qualidade.json").read_text(encoding="utf-8"))
     return registros, qualidade
 
@@ -338,4 +345,4 @@ with aba_qualidade:
                "aleatória, então o intervalo vale como referência.")
 
     st.write("**Arquivos processados**")
-    st.dataframe(df.groupby("arquivo_origem").size().rename("registros").reset_index(), hide_index=True)
+    st.dataframe(df.groupby("arquivo_origem", observed=True).size().rename("registros").reset_index(), hide_index=True)
