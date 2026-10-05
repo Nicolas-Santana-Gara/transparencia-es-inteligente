@@ -5,7 +5,7 @@ import math
 import pandas as pd
 from scipy import stats
 
-from .esquema import sem_acento_minusculo
+from .esquema import CAMPOS_BUSCA, sem_acento_minusculo
 
 MESES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
 MESES_NOME = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho",
@@ -30,7 +30,7 @@ def filtrar(df, meses=None, unidades=None, grupos=None):
 
 def serie_mensal(df, medida="valor_pago"):
     """Soma da medida em cada mês, com o número de registros que entraram."""
-    g = df.dropna(subset=["mes"]).groupby("mes")[medida].agg(total="sum", registros="count").reset_index()
+    g = df.dropna(subset=["mes"]).groupby("mes", observed=True)[medida].agg(total="sum", registros="count").reset_index()
     g["mes"] = g["mes"].astype(int)
     return g.sort_values("mes").reset_index(drop=True)
 
@@ -78,7 +78,7 @@ def intervalos_se_sobrepoem(a, b):
 
 def concentracao(df, por, medida="valor_pago"):
     """Total, participação e acumulado por unidade gestora, grupo etc."""
-    g = df.groupby(por, dropna=False)[medida].agg(total="sum", registros="count").reset_index()
+    g = df.groupby(por, dropna=False, observed=True)[medida].agg(total="sum", registros="count").reset_index()
     g = g.sort_values("total", ascending=False).reset_index(drop=True)
     soma = g["total"].sum()
     g["participacao"] = g["total"] / soma * 100 if soma else 0.0
@@ -100,11 +100,21 @@ def ic_proporcao(k, n):
 # ---------------------------------------------------------------- busca e exibição
 
 def buscar(df, termo):
-    """Procura o termo em favorecido, unidade gestora, documento e modalidade."""
+    """Procura o termo em favorecido, unidade gestora, documento e modalidade, sem ligar para acento ou maiúscula.
+
+    Compara com os valores distintos de cada campo (são poucos perto do total de linhas) e depois
+    pega as linhas que têm esses valores. Assim não é preciso guardar uma coluna extra só para a busca.
+    """
     termo = sem_acento_minusculo(termo).strip()
     if not termo:
         return df
-    return df[df["busca"].str.contains(termo, regex=False)]
+    achou = pd.Series(False, index=df.index)
+    for campo in CAMPOS_BUSCA:
+        if campo in df.columns:
+            valores = [v for v in df[campo].unique() if termo in sem_acento_minusculo(v)]
+            if valores:
+                achou |= df[campo].isin(valores)
+    return df[achou]
 
 
 def mascarar_documento(valor):

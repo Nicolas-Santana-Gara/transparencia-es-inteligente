@@ -49,7 +49,7 @@ APELIDOS = {
     "orgao": ["orgao", "nomeorgao"],
     "funcao": ["funcao", "nomefuncao"],
     "numero_processo": ["numeroprocesso", "processo", "nrprocesso"],
-    "codigo_favorecido": ["codigofavorecido", "cpfcnpj", "cnpjcpf", "cpfcnpjfavorecido", "documentofavorecido"],
+    "codigo_favorecido": ["cpfcnpjnis", "codigofavorecido", "cpfcnpj", "cnpjcpf", "cpfcnpjfavorecido", "documentofavorecido"],
 }
 
 OBRIGATORIAS = ["data", "valor_pago"]

@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .esquema import CAMPOS_BUSCA, MEDIDAS, OBRIGATORIAS, TEXTOS, mapear_colunas
+from .esquema import MEDIDAS, OBRIGATORIAS, TEXTOS, mapear_colunas
 
 RAIZ = Path(__file__).resolve().parent.parent
 
@@ -111,7 +111,11 @@ def tratar(bruto):
     originais = [c for c in bruto.columns if c not in ("arquivo_origem", "linha_origem")]
     duplicada = bruto.duplicated(subset=originais, keep="first")
     q["linhas_duplicadas"] = int(duplicada.sum())
-    df = bruto.loc[~duplicada].rename(columns={orig: interno for interno, orig in colunas.items()}).copy()
+    # daqui em diante ficam só as colunas que o painel usa (o arquivo oficial tem dezenas de outras,
+    # inclusive dados bancários, que não entram no painel)
+    manter = list(colunas.values()) + ["arquivo_origem", "linha_origem"]
+    df = bruto.loc[~duplicada, manter].rename(columns={orig: interno for interno, orig in colunas.items()}).copy()
+    q["colunas_no_arquivo"] = len(originais)
 
     # valores: as quatro etapas ficam em colunas separadas
     medidas = [m for m in MEDIDAS if m in df.columns]
@@ -138,14 +142,6 @@ def tratar(bruto):
     n = len(df)
     q["campos_totalmente_em_branco"] = [t for t in textos if n and q["em_branco"][t] == n]
     q["campos_ausentes_no_arquivo"] = [t for t in ("orgao", "funcao", "numero_processo") if t not in df.columns]
-
-    # texto único para a busca, sem acento e em minúsculas
-    campos = [c for c in CAMPOS_BUSCA if c in df.columns]
-    if campos:
-        junto = df[campos[0]].str.cat([df[c] for c in campos[1:]], sep=" | ")
-        df["busca"] = junto.str.normalize("NFKD").str.encode("ascii", "ignore").str.decode("ascii").str.lower()
-    else:
-        df["busca"] = ""
 
     # o que cada registro traz em valor pago
     q["pago_zero"] = int((df["valor_pago"] == 0).sum())
@@ -175,7 +171,8 @@ def executar(entrada, saida, demo=False):
     q["simulado"] = bool(demo)
     saida = Path(saida)
     saida.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(saida / "registros.parquet", index=False)
+    # compressão forte: o arquivo de 2025 inteiro fica com menos de 10 MB
+    df.to_parquet(saida / "registros.parquet", index=False, compression="zstd", compression_level=19)
     q["gerado_em"] = datetime.now().strftime("%d/%m/%Y %H:%M")
     (saida / "qualidade.json").write_text(json.dumps(q, ensure_ascii=False, indent=2), encoding="utf-8")
     return df, q
