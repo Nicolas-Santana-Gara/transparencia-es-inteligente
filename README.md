@@ -6,6 +6,8 @@ Painel para explorar as despesas do Governo do Espírito Santo em 2025. Mostra q
 pagamentos se concentram, quais unidades gestoras e grupos de despesa recebem mais, e
 permite chegar de qualquer número até o Documento e o Id do registro que o formou.
 
+**Painel no ar (modo demonstração):** https://transparencia-es-inteligente.vercel.app
+
 **Empresa fictícia:** DataCidadã Tech · **Turma:** 2ESPK
 
 | Integrante | RM |
