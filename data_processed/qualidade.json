@@ -1,5 +1,5 @@
 {
-  "linhas_lidas": 40000,
+  "linhas_lidas": 586208,
   "colunas": {
     "data": "Data",
     "valor_empenho": "ValorEmpenho",
@@ -8,15 +8,20 @@
     "valor_rap": "ValorRap",
     "unidade_gestora": "UnidadeGestora",
     "grupo_despesa": "GrupoDespesa",
+    "elemento_despesa": "ElementoDespesa",
+    "acao": "Acao",
     "modalidade": "Modalidade",
+    "tipo_licitacao": "TipoLicitacao",
     "favorecido": "Favorecido",
     "documento": "Documento",
     "id": "Id",
     "orgao": "Orgao",
     "funcao": "Funcao",
-    "numero_processo": "NumeroProcesso"
+    "numero_processo": "NumeroProcesso",
+    "codigo_favorecido": "CpfCnpjNis"
   },
   "linhas_duplicadas": 0,
+  "colunas_no_arquivo": 71,
   "valores_invalidos": {
     "valor_empenho": 0,
     "valor_liquidado": 0,
@@ -28,13 +33,16 @@
   "em_branco": {
     "unidade_gestora": 0,
     "grupo_despesa": 0,
+    "elemento_despesa": 0,
+    "acao": 0,
     "modalidade": 0,
+    "tipo_licitacao": 0,
     "favorecido": 0,
     "documento": 0,
     "id": 0,
-    "orgao": 40000,
-    "funcao": 40000,
-    "numero_processo": 40000
+    "orgao": 586208,
+    "funcao": 586208,
+    "numero_processo": 586208
   },
   "campos_totalmente_em_branco": [
     "orgao",
@@ -42,17 +50,20 @@
     "numero_processo"
   ],
   "campos_ausentes_no_arquivo": [],
-  "pago_zero": 27974,
-  "pago_negativo": 843,
-  "pago_positivo": 11183,
+  "pago_zero": 413609,
+  "pago_negativo": 12747,
+  "pago_positivo": 159852,
   "pago_em_branco": 0,
-  "registros": 40000,
+  "registros": 586208,
   "periodo": [
     "02/01/2025",
     "31/12/2025"
   ],
   "arquivos": [
-    "dados_simulados_demo.csv"
+    "despesas_es_2025_completo_parte_01.zip/despesas_es_2025_completo_parte_01.csv",
+    "despesas_es_2025_completo_parte_02.zip/despesas_es_2025_completo_parte_02.csv",
+    "despesas_es_2025_completo_parte_03.zip/despesas_es_2025_completo_parte_03.csv",
+    "despesas_es_2025_completo_parte_04.zip/despesas_es_2025_completo_parte_04.csv"
   ],
   "medidas": [
     "valor_empenho",
@@ -60,6 +71,6 @@
     "valor_pago",
     "valor_rap"
   ],
-  "simulado": true,
-  "gerado_em": "04/10/2026 18:42"
+  "simulado": false,
+  "gerado_em": "05/10/2026 17:02"
 }
