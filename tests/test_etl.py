@@ -90,3 +90,14 @@ def test_modo_demo_fica_marcado_como_simulado(tmp_path):
 
 def test_dados_reais_nao_sao_marcados_como_simulados(processado):
     assert processado[2]["simulado"] is False
+
+
+def test_so_as_colunas_usadas_vao_para_o_arquivo_processado(tmp_path):
+    # o arquivo oficial tem dezenas de colunas (inclusive dados bancários); o painel só guarda as que usa
+    gravar_zip(tmp_path, cabecalho="Id;Data;ValorPago;UnidadeGestora;BancoOrigem;AgenciaOrigem",
+               linhas=["1;15/01/2025;100,00;FUNDO X;021;0675", "2;16/01/2025;0,00;FUNDO X;021;0675"])
+    df, q = etl.executar(tmp_path, tmp_path / "saida")
+    gravado = pd.read_parquet(tmp_path / "saida" / "registros.parquet")
+    assert q["colunas_no_arquivo"] == 6
+    assert "BancoOrigem" not in gravado.columns and "AgenciaOrigem" not in gravado.columns
+    assert {"id", "data", "valor_pago", "unidade_gestora", "arquivo_origem", "linha_origem"} <= set(gravado.columns)

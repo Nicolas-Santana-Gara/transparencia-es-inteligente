@@ -85,3 +85,11 @@ def test_tabela_mantem_id_e_documento_e_mascara_cpf(processado):
     assert "12345678901" not in tabela["CPF/CNPJ"].tolist()
     assert "***.456.789-**" in tabela["CPF/CNPJ"].tolist()
     assert "12345678000199" in tabela["CPF/CNPJ"].tolist()     # CNPJ é mantido
+
+
+def test_busca_funciona_com_texto_lido_como_categoria(processado):
+    # o painel lê os textos repetidos como categoria para gastar menos memória
+    _, df, _ = processado
+    categorico = df.astype({"favorecido": "category", "unidade_gestora": "category", "modalidade": "category"})
+    assert len(analise.buscar(categorico, "ficticia")) == 3
+    assert analise.concentracao(categorico[categorico["unidade_gestora"] == "FUNDO DE TESTE A"], "unidade_gestora").shape[0] == 1
