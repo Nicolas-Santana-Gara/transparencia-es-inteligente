@@ -1,0 +1,12 @@
+# Imagem usada pelo Vercel para servir o painel (Streamlit precisa de um servidor rodando).
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# O Vercel informa a porta na variável PORT
+CMD ["sh", "-c", "streamlit run app.py --server.port ${PORT:-3000} --server.address 0.0.0.0 --server.headless true --browser.gatherUsageStats false"]
